@@ -18,7 +18,7 @@ implement Haar
 #Definicije funkcij
 
 #Funkcija najde vse slike in resnice in vrne seznam poti do slik in resnic
-def slike(pot):
+def najdi_poti(pot):
     poti_do_slik = glob.glob(pot + '*.png')
     poti_do_resnic = glob.glob(pot + '*.txt')
 
@@ -32,3 +32,7 @@ def slike(pot):
 
 # ------------------------------------------ Začetek "izvajanja" programa --------------------------------------------------------------------------
 pot_do_testnih_podatkov = pot = "Support Files/ear_data/test/"
+
+poti_do_slik, poti_do_resnic = najdi_poti(pot_do_testnih_podatkov)
+#print(poti_do_slik[0], poti_do_resnic[0])
+
