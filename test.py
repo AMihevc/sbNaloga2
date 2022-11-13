@@ -48,6 +48,13 @@ def izrisi_sliko(slika):
 
     return 0
 
+#funkcija doda skatlo na sliko
+#skatla mora biti oblike (x,y,w,h)
+def dodaj_skatlo(slika, skatla):
+    for (x,y,w,h) in skatla:
+        cv2.rectangle(slika, (x, y),(x + w, y + h), (0, 0, 255), 5)
+    return 0
+
 
 #pravilna pot do slik in resnic 
 pot = "Support Files/ear_data/test/"
@@ -65,8 +72,8 @@ slika = cv2.imread(pot_do_slike, 1)
 #mr bean z resnico 
 slika_z_resnico = dodaj_resnico(pot_do_slike)
 
-#izris slike z resnico 
-#izrisi_sliko(slika)
+#izris slike 
+izrisi_sliko(slika)
 
 #izrisi_sliko(slika_z_resnico)
 
@@ -82,3 +89,18 @@ rezultat_yolo.print()
 
 #haar-cascade 
 
+#sliko pretvori v gray scale 
+slika_grey = cv2.cvtColor(slika, cv2.COLOR_BGR2GRAY)
+
+#naloži modele za levo in desno uho 
+
+levo_uho_filter_VJ = cv2.CascadeClassifier('Support Files\haarcascade_mcs_leftear.xml')
+desno_uho_filter_VJ = cv2.CascadeClassifier('Support Files\haarcascade_mcs_rightear.xml')
+
+levo_uho_skatla = levo_uho_filter_VJ.detectMultiScale(slika_grey, scaleFactor = 1.2, minNeighbors = 5)
+desno_uho_skatla = desno_uho_filter_VJ.detectMultiScale(slika_grey, scaleFactor = 1.2, minNeighbors = 5)
+
+
+dodaj_skatlo(slika_grey,levo_uho_skatla)
+
+izrisi_sliko(slika_grey)

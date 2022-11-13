@@ -74,6 +74,12 @@ def yolo_model(slika):
 
     return rezultat_yolo
 
+#funkcija doda skatlo na sliko
+#skatla mora biti oblike (x,y,w,h)
+def dodaj_skatlo(slika, skatla):
+    for (x,y,w,h) in skatla:
+        cv2.rectangle(slika, (x, y),(x + w, y + h), (0, 0, 255), 5)
+    return 0
 
 # ------------------------------------------ Začetek "izvajanja" programa --------------------------------------------------------------------------
 pot_do_testnih_podatkov = "Support Files/ear_data/test/"
