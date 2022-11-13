@@ -2,20 +2,20 @@ from math import cos, pi, sin
 import cv2
 import glob
 import numpy as np
-
+import torch
 
 #random things I need to test before implementing in solution
 
-
-def dodaj_resnico(slika, pot_do_slike):
-
+#naredi novo sliko z dodano resnico
+def dodaj_resnico( pot_do_slike):
+    slika_s_kvadratom = cv2.imread(pot_do_slike, 1)
     pot_do_resnice = pot_do_slike[:len(pot_do_slike)-3] + 'txt'
 
     with open (pot_do_resnice, 'rt') as resnica:
         for vrstica in resnica:
             _ , resnica_center_x , resnica_center_y ,resnica_širina , resnica_višina = [float(i) for i in vrstica.rstrip("\n").split(" ")]
 
-    slika_h, slika_w, _ = slika.shape
+    slika_h, slika_w, _ = slika_s_kvadratom.shape
 
     #pretvorba v pixel vrednosti širine in višine 
     resnica_širina = resnica_širina * slika_w
@@ -31,11 +31,12 @@ def dodaj_resnico(slika, pot_do_slike):
     barva_kvadrata = (64,170,0)
     debelina_kvadrata = 5
 
-    slika_s_kvadratom = cv2.rectangle(slika, zacetek_kvadrata, konec_kvadrata, barva_kvadrata, debelina_kvadrata)
+    slika_s_kvadratom = cv2.rectangle(slika_s_kvadratom, zacetek_kvadrata, konec_kvadrata, barva_kvadrata, debelina_kvadrata)
 
 
     return slika_s_kvadratom
 
+#izriše podano sliko
 def izrisi_sliko(slika):
 
     cv2.imshow('IZRIS SLIKE', slika)
@@ -56,13 +57,28 @@ poti_do_slik = glob.glob(pot + '*.png')
 
 #preberi eno sliko
 
-pot_do_slike = "Support Files/ear_data/test/0501.png"
+pot_do_slike = "Support Files/ear_data/test/0501.png" # mr.bean
 slika = cv2.imread(pot_do_slike, 1)
+
 #slika_rgb = cv2.cvtColor(slika,cv2.COLOR_BGR2RGB)
 
-slika = dodaj_resnico(slika, pot_do_slike)
+#mr bean z resnico 
+slika_z_resnico = dodaj_resnico(pot_do_slike)
 
-#izris slike
+#izris slike z resnico 
+#izrisi_sliko(slika)
+
+#izrisi_sliko(slika_z_resnico)
+
+# yolov5 model
+#model = torch.hub.load('Support Files', model='yolo5s', source='local')
+
+model_yolo = torch.hub.load( 'yolov5', 'custom', path='Support Files/yolo5s.pt', source="local")
+
+rezultat_yolo = model_yolo(slika)
+
+rezultat_yolo.print()
 
 
-izrisi_sliko(slika)
+#haar-cascade 
+

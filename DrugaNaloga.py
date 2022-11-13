@@ -2,6 +2,7 @@ from math import cos, pi, sin
 import cv2
 import glob
 import numpy as np
+import torch
 
 
 #Code for the solution of the assigment
@@ -66,6 +67,12 @@ def izrisi_sliko(slika):
 
     return 0
 
+def yolo_model(slika):
+    model  = torch.hub.load( 'yolov5', 'custom', path='Support Files/yolo5s.pt', source="local")
+
+    rezultat_yolo = model(slika)
+
+    return rezultat_yolo
 
 
 # ------------------------------------------ Začetek "izvajanja" programa --------------------------------------------------------------------------
@@ -74,4 +81,9 @@ pot_do_testnih_podatkov = "Support Files/ear_data/test/"
 poti_do_slik, poti_do_resnic = najdi_poti(pot_do_testnih_podatkov)
 #print(poti_do_slik[0], poti_do_resnic[0])
 
+
+#TODO 
+'''
+Za vse slike izračunaj modele in ostalo kar je potrebno 
+'''
 
