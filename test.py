@@ -86,8 +86,6 @@ def izracunaj_Haar(pot_do_slike, scaleFaktor, minSosedov, levo_uho_filter_VJ, de
     #odpri sliko v 
     slika_grey = cv2.imread(pot_do_slike, 0)
 
-
-
     #zaznaj ušesa
     levo_uho_skatla = levo_uho_filter_VJ.detectMultiScale(slika_grey, scaleFactor = scaleFaktor, minNeighbors = minSosedov)
     desno_uho_skatla = desno_uho_filter_VJ.detectMultiScale(slika_grey, scaleFactor = scaleFaktor, minNeighbors = minSosedov)
@@ -222,18 +220,18 @@ def obdelaj_slike(poti_do_slik, scaleFactor, stSosedov, threshold):
     levo_uho_filter_VJ = cv2.CascadeClassifier('Support Files\haarcascade_mcs_leftear.xml')
     desno_uho_filter_VJ = cv2.CascadeClassifier('Support Files\haarcascade_mcs_rightear.xml')
 
-    #model  = torch.hub.load( 'yolov5', 'custom', path='Support Files/yolo5s.pt', source="local")
+    model  = torch.hub.load( 'yolov5', 'custom', path='Support Files/yolo5s.pt', source="local")
     # za vse slike dub škatle in zračuni
     yolo_global_tpfpfn = (0, 0, 0)
     vj_global_tpfpfn = (0, 0, 0)
-    counter_slik = 0
+    
     for pot_do_slike in poti_do_slik:
         
         #pridobi resnico škatle
         resnica = dobi_resnico(pot_do_slike)
 
         #pridobi seznam škatel yolo. Oblika [[x1, y1, x2, y2],[skatla2], ...]
-        #skatle_yolo = yolo_model_skatle(pot_do_slike,model)
+        skatle_yolo = yolo_model_skatle(pot_do_slike,model)
 
         #pridobi seznam škatel VJ. Oblika [[x,y,w,h]]
         skatle_VJ = izracunaj_Haar(pot_do_slike, scaleFactor, stSosedov, levo_uho_filter_VJ, desno_uho_filter_VJ)
@@ -241,27 +239,19 @@ def obdelaj_slike(poti_do_slik, scaleFactor, stSosedov, threshold):
         #pretvori VJ skatle v obliko [[x1, y1, x2, y2],[skatla2], ...]]
         skatle_VJ = pretvor_obliko(skatle_VJ)
 
-        #izrisi rezultate
-        #resnica je ZELENA 
-        #slika_z_resnico = dodaj_resnico(pot_do_slike)
-        #dodam yolo skatle (MODRE)
-        #dodaj_skatlo(slika_z_resnico,skatle_yolo,(255,0,0))
-        #dodam VJ skatle (RDEČE)
-        #dodaj_skatlo(slika_z_resnico,skatle_VJ,(0,0,255))
-    	#izrisem sliko
-        #izrisi_sliko(slika_z_resnico)
-
+ 
         #pridobi tp, fp, fn za yolo 
-        #yolo_tpfpfn = dobi_tpfpfn(resnica,skatle_yolo,threshold)
+        yolo_tpfpfn = dobi_tpfpfn(resnica,skatle_yolo,threshold)
         #print(yolo_tpfpfn)
 
         #pridobi tp, fp, fn za VJ
         vj_tpfpfn = dobi_tpfpfn(resnica,skatle_VJ,threshold)
         #print(vj_tpfpfn)
 
-        #yolo_global_tpfpfn = tuple(map(sum, zip(yolo_tpfpfn, yolo_global_tpfpfn)))
-        print(counter_slik)
-        counter_slik += 1
+        yolo_global_tpfpfn = tuple(map(sum, zip(yolo_tpfpfn, yolo_global_tpfpfn)))
+
+        #print(counter_slik)
+        #counter_slik += 1
 
         vj_global_tpfpfn = tuple(map(sum, zip(vj_tpfpfn, vj_global_tpfpfn)))
 
@@ -275,101 +265,15 @@ absolutna_pot = "/home/anze/Documents/Faks/Slikovna biometrija/DrugaDomacaNaloga
 
 poti_do_slik = glob.glob(pot + '*.png')
 
-#preberi eno sliko
-#pot_do_mrBean = poti_do_slik[0] # mr.bean
-#slika = cv2.imread(pot_do_mrBean, 1)
 
-#mr bean z resnico 
-#slika_z_resnico = dodaj_resnico(pot_do_mrBean)
-
-# yolov5 model ----------------------------------------
-'''
-model_yolo = torch.hub.load( 'yolov5', 'custom', path='Support Files/yolo5s.pt', source="local")
-
-rezultat_yolo = model_yolo(pot_do_slike)
-
-rezultat_yolo.show()
-
-'''
-
-#skatle_yolo = yolo_model_skatle(pot_do_mrBean)
-#print("skatle_yolo")
-#print(skatle_yolo)
-
-#dodaj_skatlo(slika_z_resnico,skatle_yolo,(255,0,0))
-
-#haar-cascade --------------------------------------------
-'''
-#sliko pretvori v gray scale 
-slika_grey = cv2.cvtColor(slika, cv2.COLOR_BGR2GRAY)
-
-#naloži modele za levo in desno uho 
-
-levo_uho_filter_VJ = cv2.CascadeClassifier('Support Files\haarcascade_mcs_leftear.xml')
-desno_uho_filter_VJ = cv2.CascadeClassifier('Support Files\haarcascade_mcs_rightear.xml')
-
-levo_uho_skatla = levo_uho_filter_VJ.detectMultiScale(slika_grey, scaleFactor = 1.2, minNeighbors = 5)
-desno_uho_skatla = desno_uho_filter_VJ.detectMultiScale(slika_grey, scaleFactor = 1.1, minNeighbors = 5)
-
-#print(levo_uho_skatla)
-#print(desno_uho_skatla)
-
-'''
-
-#izračunam Haar skatle 
-#zdruzen_seznam = izracunaj_Haar(pot_do_mrBean, 1.03, 4)
-#print("Zdruzen seznam:")
-#print(zdruzen_seznam)
-
-#skatle_VJ = pretvor_obliko(zdruzen_seznam)
-#print("skatle_VJ")
-#print(skatle_VJ)
-
-#samo za izris
-#dodaj_skatlo(slika_z_resnico, skatle_VJ, (0,0,255))
-
-#izrisi_sliko(slika_z_resnico)
-
-#za računanje IOU 
-#resnica = dobi_resnico(pot_do_mrBean)
-#print(resnica)
-
-#iou = get_iou(resnica,VJ_seznam[0])
-#print(iou)
-
-#pridobi tp, fp, fn za yolo 
-#yolo_tpfpfn = dobi_tpfpfn(resnica, skatle_yolo, 0.5)
-
-#pridobi tp, fp, fn za VJ
-'''
-vj_tpfpfn = dobi_tpfpfn(resnica, skatle_VJ, 0.5)
-print("yolo_tpfpfn")
-print(yolo_tpfpfn)
-print("vj_tpfpfn")
-print(vj_tpfpfn)
-'''
-#izrisi_sliko(slika_z_resnico)
-
-#optimizacija pri 0.5 treshold za iou
-
-deset_slik = [poti_do_slik[0],poti_do_slik[1],poti_do_slik[2], poti_do_slik[3], poti_do_slik[4],poti_do_slik[5],poti_do_slik[6],poti_do_slik[7],poti_do_slik[8],poti_do_slik[9],poti_do_slik[10]]
-
-dve_sliki = [poti_do_slik[0],poti_do_slik[1]]
-
-rezultati_tpfpfn = obdelaj_slike(poti_do_slik, 1.01, 0, 0.5)
+rezultati_tpfpfn = obdelaj_slike(poti_do_slik, 1.03, 7, 0.5)
 
 print(rezultati_tpfpfn)
 
-'''
-yolo 
-"0.5": [157,67,298]
-vj 
-"0.5": [157,67,298]
 
-'''
-TP = rezultati_tpfpfn[0][0]
-FP = rezultati_tpfpfn[0][1]
-FN = rezultati_tpfpfn[0][2]
+#TP = rezultati_tpfpfn[0][0]
+#FP = rezultati_tpfpfn[0][1]
+#FN = rezultati_tpfpfn[0][2]
 
 yolo_iou = rezultati_tpfpfn[0][0] / (sum(rezultati_tpfpfn[0]))
 vj_iou = rezultati_tpfpfn[1][0] / (sum(rezultati_tpfpfn[1]))
@@ -377,9 +281,9 @@ vj_iou = rezultati_tpfpfn[1][0] / (sum(rezultati_tpfpfn[1]))
 print(yolo_iou)
 print(vj_iou)
 
-precsion = TP / TP+FP
-recall = TP / TP+FN
+#precsion = TP / TP+FP
+#recall = TP / TP+FN
 
-print("Precision" + str(precsion))
+#print("Precision" + str(precsion))
 
-print("Recall" + str(recall))
+#print("Recall" + str(recall))
